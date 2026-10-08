@@ -1,0 +1,32 @@
+import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
+import { resolve, join } from 'node:path';
+import { AppServer } from '../src/app-server.mjs';
+import assert from 'node:assert/strict';
+const base=await mkdtemp(resolve('.probe/plugin-removal-'));
+const home=join(base,'home'), plugin=join(base,'fixture');
+await mkdir(home);await mkdir(join(plugin,'.codex-plugin'),{recursive:true});
+await mkdir(join(plugin,'skills/removal-probe'),{recursive:true});
+await writeFile(join(plugin,'skills/removal-probe/SKILL.md'),'---\nname: removal-probe\ndescription: Disposable lifecycle probe.\n---\nNo actions.');
+await writeFile(join(plugin,'.codex-plugin/plugin.json'),JSON.stringify({name:'removal-probe',version:'0.0.1',description:'Disposable removal probe',skills:'./skills/'}));
+await mkdir(join(base,'.agents/plugins'),{recursive:true});
+const market=join(base,'.agents/plugins/marketplace.json');
+await writeFile(market,JSON.stringify({name:'removal-probe-market',plugins:[{name:'removal-probe',source:{source:'local',path:'./fixture'},policy:{installation:'AVAILABLE',authentication:'ON_INSTALL'},category:'Productivity'}]}));
+const a=new AppServer(process.argv[2],['app-server'],{env:{...process.env,CODEX_HOME:home}});
+let observer;
+try{
+ await a.initialize();
+ await a.request('marketplace/add',{source:base});
+ const installParams={pluginName:'removal-probe',marketplacePath:market};
+ await a.request('plugin/install',installParams);
+ observer=new AppServer(process.argv[2],['app-server'],{env:{...process.env,CODEX_HOME:home}});
+ await observer.initialize();
+ const params={cwds:[base],installSuggestionPluginNames:['removal-probe']};
+ const installed=async()=>{const r=await observer.request('plugin/installed',params);assert.equal(r.marketplaceLoadErrors.length,0);return r.marketplaces.flatMap(m=>m.plugins).find(p=>p.name==='removal-probe')?.installed;};
+ assert.equal(await installed(),true);
+ await a.request('plugin/uninstall',{pluginId:'removal-probe@removal-probe-market'});
+ assert.equal(await installed(),false);
+ await a.request('plugin/install',installParams);assert.equal(await installed(),true);
+ await a.request('plugin/uninstall',{pluginId:'removal-probe@removal-probe-market'});assert.equal(await installed(),false);
+ console.log('PASS: separate observer sees installed -> removed -> reinstalled -> removed through native API.');
+ console.log('home',home);
+}catch(e){console.log(e.message.slice(0,700));process.exitCode=1;}finally{await observer?.close();await a.close();}

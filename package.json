@@ -1,0 +1,20 @@
+{
+  "name": "feishu-codex-bridge",
+  "version": "0.0.7",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "scripts": {
+    "start": "node src/cli.mjs serve",
+    "doctor": "node src/cli.mjs doctor",
+    "package:windows": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/package.ps1",
+    "test": "node --test test/*.test.mjs",
+    "probe": "node scripts/probe.mjs"
+  },
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "1.73.3",
+    "@openai/codex": "0.155.1"
+  }
+}

@@ -1,0 +1,14 @@
+node_modules/
+.probe/
+.env
+.env.*
+!.env.example
+*.log
+.feishu-bridge/
+.feishu-codex-bridge/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+/test.txt
+dist/
