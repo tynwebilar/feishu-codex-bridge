@@ -30,7 +30,7 @@ MCP 仅负责管理，关闭 MCP 不影响独立桥接服务。没有可用 MCP 
 
 - 所有管理操作使用已安装 runtimePath，不能从插件缓存运行服务。数据目录默认 `%USERPROFILE%\.feishu-codex-bridge`，程序目录与数据分开。若用户已有 FEISHU_CODEX_HOME，保留其选择，并对所有管理命令一致传入 `-DataDirectory`。
 - 退出 Codex 桌面后服务应继续运行；关机、注销、休眠或断网会影响处理。开机启动仅在用户要求时执行 `-Action startup-on`。
-- 飞书拥有会话写权限期间，桌面可以查看历史但显示占用提示；这是预期行为。要交给桌面，停止桥接并确认终态。`/stop` 只取消模型任务，不释放服务的会话占用。侧栏归组可能延迟。
+- 飞书拥有会话写权限期间，桌面可以查看历史但显示占用提示；这是预期行为。要交给桌面，停止桥接并确认终态。`/stop` 只取消模型任务，不释放服务的会话占用。后台 projectId 不证明桌面归组；未显示时通过会话右键“移动到项目”处理，不反复要求刷新。
 - 诊断先 status，再 doctor。doctor 只检查配置和机器人身份；不证明所有权限、模型执行或附件交付成功。仅报告脱敏错误码，不展示原始日志/SDK 响应。
 - 执行未知先 `/recover`，交付失败按 USER-GUIDE 使用 `/retry`；不要重跑可能有副作用的任务，不手改数据库。
 - 升级：停止并确认 stopped，备份数据，重新运行安装脚本生成新运行目录，再从新目录启动。旧运行目录保留。若启用了开机启动，从新目录重新设置。真正跨版本升级/回滚尚未验收。
@@ -58,3 +58,21 @@ MCP 仅负责管理，关闭 MCP 不影响独立桥接服务。没有可用 MCP 
 ## 0.0.7 初始化检查
 
 配置时让用户选择是否启用个人飞书资源访问（Y）；确认后才启用 CLI 用户身份。初次独立绑定由实际后台进程完成，避免桌面与后台凭据存储差异。不要从当前 agent 手工 config init 覆盖全局应用，也不要把密钥写进参数。后台状态 cli.state=ready 才代表应用凭据检查完成；用户授权仍需卡片。CLI unavailable 不代表桥接断连，应单独报告。已有配置不重新 setup。新版 runtime/plugin 均为 0.0.7，升级时保留数据和旧目录。
+
+## 0.0.8 群权限与共享上下文
+
+用 bridge_permissions_get 读取规则和 revision，再按用户明确要求调用 bridge_permissions_set，传 expectedRevision 和完整 permissions。仅支持明确 chatId/open_id，不凭名称猜 ID。先展示目标群、成员与修改内容；用户已明确指定即执行。修改前停止后台，停止会中断当前任务，先检查 active 并等待空闲；保存后从同一 dataDirectory 启动，确认连接。旧 revision 会拒绝，先重读再判断，不盲目重试。
+
+permissions.groupContext=shared 表示每群一个上下文（含话题），per-sender 保持旧版成员/话题隔离。改变模式只影响后续路由，旧历史保留。群规则包含 chatId、enabled、requireMention、senderIds、trustedLocalAccess；未列出的群/成员拒绝，私聊仍仅主人。/new /stop /recover /retry 仅主人，问答只能原请求人回答。
+
+新增非主人前必须向用户说明：当前共享 Windows 身份并非系统级隔离，成员可通过模型使用本机执行环境能力；只有用户明确接受该信任范围才设 trustedLocalAccess=true，否则不开放非主人成员。此字段不是凭据隔离或安全沙箱。个人画像仅在主人私聊自动注入，群聊不能以此获得个人 OAuth 授权。
+
+自定义正式数据目录必须每次传 dataDirectory，不要误操作默认测试配置。工作区知识不属于插件包；不上传个人画像、工作记录、密钥。旧桥接与新桥接不能同时连接同一应用。
+
+0.0.9 普通答复使用 Markdown 卡片，授权卡片保持独立。升级插件后仍须升级并重启后台运行目录，不能只凭插件版本推断当前消息格式。
+
+## 项目绑定兼容性
+
+初始化时先让用户在桌面添加工作目录，再在停止状态用 manage.ps1 -Action project 选择已有后台项目。明确后台 ID 时可用 node src/cli.mjs project <ID>；此 ID 不是桌面 list_projects 的本地 ID，必须通过 project/list 核对路径与名称，不能直接混用。保留原 dataDirectory。没有项目不创建，同路径多个项目不猜测。projectBinding.backend_selected 只表示后续新会话的后台目标，desktopVisibility=unverified 必须保留。旧版本无字段也不能宣称归组成功。
+
+已有会话不迁移/重建历史。当前桌面有会话右键“移动到项目”入口；无桌面控制工具时请用户操作并确认实际显示，不通过 shell 修改私有状态。后续新会话也可能需要手动归组，不承诺操作一次解决所有新会话。

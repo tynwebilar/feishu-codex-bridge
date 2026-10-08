@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {parseEvent} from '../src/messages.mjs';
+import {validatePermissions,admitted} from '../src/permissions.mjs';
+import {Bridge} from '../src/bridge.mjs';
+test('shared group keys retain sender identity, isolate chats and private input, gate members and management',async()=>{
+ const c={appId:'cli_test',ownerId:'ou_owner',botId:'ou_bot',groups:[],permissions:{groupContext:'shared',groups:[{chatId:'oc_one',enabled:true,requireMention:true,senderIds:['ou_owner','ou_peer'],trustedLocalAccess:true}]}};
+ validatePermissions(c.permissions);
+ const e={sender:{sender_type:'user',sender_id:{open_id:'ou_owner'}},message:{message_id:'om_test',chat_id:'oc_one',chat_type:'group',message_type:'text',content:'{"text":"hello"}',mentions:[{id:{open_id:'ou_bot'}}]}};
+ const owner=parseEvent(e,c);e.sender.sender_id.open_id='ou_peer';const peer=parseEvent(e,c);assert.equal(owner.chat,peer.chat);assert.notEqual(owner.senderId,peer.senderId);
+ e.message.chat_id='oc_other';assert.equal(parseEvent(e,c),null);e.message.chat_id='oc_one';e.message.chat_type='p2p';assert.equal(parseEvent(e,c),null);e.sender.sender_id.open_id='ou_owner';assert.notEqual(parseEvent(e,c).chat,owner.chat);
+ assert.equal(admitted(c,true,'oc_one','ou_unknown'),false);
+ let reply;const b=new Bridge(c,{get:()=>({}),finish:(_,text)=>{reply=text;}},{},{});await b.control({...peer,text:'/new'});assert.match(reply,/主人/);
+ c.permissions.groups[0].trustedLocalAccess=false;assert.equal(admitted(c,true,'oc_one','ou_peer'),false);
+ assert.throws(()=>validatePermissions({...c.permissions,unexpected:true}));
+});

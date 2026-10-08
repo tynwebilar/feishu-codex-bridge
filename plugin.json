@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "feishu-codex-bridge",
-  "version": "0.0.7",
+  "version": "0.0.10",
   "description": "在 Windows 上引导安装、配对和管理飞书与 Codex 的独立消息桥接。开发预览。",
   "author": {
     "name": "AI_research_center"

@@ -9,7 +9,7 @@ import { Writable } from 'node:stream';
 import { dataDir, loadConfig, saveConfig, protect, UserError } from './config.mjs';
 import { AppServer } from './app-server.mjs';
 import { connectFeishu } from './feishu.mjs';
-import { ensureProject } from './projects.mjs';
+import { listWorkspaceProjects, resolveProjectBinding } from './projects.mjs';
 import { Store } from './store.mjs';
 import { Bridge } from './bridge.mjs';
 import { parseEvent } from './messages.mjs';
@@ -45,6 +45,7 @@ async function setup() {
       secret = (await rl.question('')).trim(); muted = false; process.stdout.write('\n');
     }
     const cwd = resolve((await rl.question('工作区绝对路径：')).trim());
+    console.log('工作区目录不等于桌面项目。请在 Codex 中添加该目录，再使用 project 命令选择已有项目；不会自动创建后台项目。');
     const cliUserEnabled=(await rl.question('启用个人飞书资源访问？将在独立 CLI 配置中绑定此应用，具体权限仍需卡片授权。输入 Y 启用（默认不启用）：')).trim().toUpperCase()==='Y';
     if(cliUserEnabled) cliPath();
     console.log('权限：1 只读（默认）  2 可写工作区  3 完全访问本机');
@@ -112,6 +113,29 @@ async function resolveUnknown() {
     console.log('已记录人工核对。重新启动桥接后可接收新消息。');
   } finally { rl.close(); store.close(); }
 }
+async function selectProject() {
+  await requireStopped();
+  const config = await loadConfig();
+  const client = new AppServer(process.execPath, [join(root, 'node_modules/@openai/codex/bin/codex.js'), 'app-server']);
+  let rl;
+  try {
+    await client.initialize();
+    const projects = await listWorkspaceProjects(client, config.cwd);
+    if (!projects.length) throw new UserError('没有匹配工作目录的后台项目。请先在 Codex 桌面添加该目录，再重试；不会自动创建重复项目。');
+    let id = process.argv[3];
+    if (!id) {
+      if (!process.stdin.isTTY) throw new UserError('请在本机终端运行 project 选择项目，或传入已核实的后台项目 ID。');
+      projects.forEach((p, i) => console.log(`${i + 1}. ${p.name} (${p.id})`));
+      rl = createInterface({ input: process.stdin, output: process.stdout });
+      const choice = (await rl.question('选择与桌面目标项目对应的编号：')).trim();
+      if (!/^[1-9][0-9]*$/.test(choice)) throw new UserError('项目选择无效。');
+      id = projects[Number(choice) - 1]?.id;
+    }
+    if (!projects.some(p => p.id === id)) throw new UserError('项目不匹配当前工作目录，未修改配置。');
+    await saveConfig({ ...config, projectId: id });
+    console.log('已保存后台项目选择，仅影响后续新会话。桌面归组尚未验证；已有会话请右键“移动到项目”，并在项目下确认显示。');
+  } finally { rl?.close(); await client.close(); }
+}
 async function serve() {
   const config = await loadConfig();
   const pairing = process.argv.includes('--pair');
@@ -130,10 +154,11 @@ async function serve() {
     const cliStatus=await ensureCli(config).catch(error=>({state:'unavailable',message:error instanceof UserError ? error.message : 'CLI 初始化未完成。'}));
     feishu = await connectFeishu(config);
     config.botId = feishu.botId;
-    const env = cliEnvironment(); delete env.FEISHU_APP_SECRET;
+    const env = cliEnvironment(); delete env.FEISHU_APP_SECRET; env.FEISHU_BRIDGE_REMOTE='1';
     codex = new AppServer(process.execPath, [join(root, 'node_modules/@openai/codex/bin/codex.js'), '-c', cliShellOverride(), 'app-server'], { env });
     await codex.initialize();
-    const projectId = await ensureProject(codex, config.cwd);
+    const projectBinding = await resolveProjectBinding(codex, config.cwd, config.projectId);
+    const { projectId } = projectBinding;
     store = new Store(join(dataDir, 'bridge.sqlite'));
     store.assertAccount(config.appId);
     const bridge = new Bridge(config, store, codex, feishu, projectId);
@@ -191,7 +216,7 @@ async function serve() {
           feishu: feishu.status(), codex: codex.closed ? 'disconnected' : 'connected',
           paired: !!config.ownerId, active: !!bridge.active, ownershipConflicts: bridge.ownershipConflicts,
           pluginLifecycle:removalGuard?.status ?? 'not_enrolled',
-          pausedForUnknownExecution: bridge.uncertain ?? null, projectId, counts: store.stats() };
+          pausedForUnknownExecution: bridge.uncertain ?? null, projectId, projectBinding, counts: store.stats() };
         await writeFile(statusPath + '.tmp', JSON.stringify(status, null, 2));
         await rename(statusPath + '.tmp', statusPath);
         if (codex.closed) stopping = true;
@@ -225,6 +250,7 @@ async function serve() {
 }
 try {
   if (command === 'setup') await setup();
+  else if (command === 'project') await selectProject();
   else if (command === 'groups') await groups();
   else if (command === 'resolve') await resolveUnknown();
   else if (command === 'serve') await serve();
@@ -237,7 +263,7 @@ try {
     const f = await connectFeishu(config);
     console.log(JSON.stringify({ appId: config.appId, bot: f.name, credentials: 'ok', paired: !!config.ownerId, cwd: config.cwd, sandbox: config.sandbox }, null, 2));
     f.close();
-  } else console.log('Feishu Codex Bridge (开发预览)\nsetup 配置\ngroups 群白名单\nresolve 本机核对未知任务\nserve [--pair] 启动/首次配对\nstatus 状态\nstop 停止\ndoctor 检查配置和飞书身份');
+  } else console.log('Feishu Codex Bridge (开发预览)\nsetup 配置\nproject [项目ID] 选择已有后台项目（需停止服务）\ngroups 群白名单\nresolve 本机核对未知任务\nserve [--pair] 启动/首次配对\nstatus 状态\nstop 停止\ndoctor 检查配置和飞书身份');
 } catch (error) {
   console.error(error instanceof UserError ? error.message : error.code === 'ENOENT'
     ? '未找到配置、工作区或状态文件。首次使用请打开 Start.cmd 选择“配置”。'

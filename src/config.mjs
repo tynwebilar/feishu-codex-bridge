@@ -1,3 +1,4 @@
+import {validatePermissions} from './permissions.mjs';
 import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile, rename, stat } from 'node:fs/promises';
 import { resolve, join, isAbsolute } from 'node:path';
@@ -11,7 +12,9 @@ export function validate(config) {
   if (config.ownerId && !/^ou_[a-zA-Z0-9]+$/.test(config.ownerId)) throw new UserError('用户 open_id 格式无效。');
   if (!Array.isArray(config.groups) || config.groups.some(id => !/^oc_[a-zA-Z0-9]+$/.test(id))) throw new UserError('群白名单无效。');
   if (!isAbsolute(config.cwd ?? '') || !['read-only','workspace-write','danger-full-access'].includes(config.sandbox)) throw new UserError('工作区或权限配置无效。');
+  if (config.projectId != null && !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(config.projectId)) throw new UserError('项目 ID 无效。');
   if (!config.secretDpapi && !process.env.FEISHU_APP_SECRET) throw new UserError('缺少应用密钥，请重新配置。');
+  if(config.permissions) validatePermissions(config.permissions);
   return config;
 }
 export async function loadConfig() {

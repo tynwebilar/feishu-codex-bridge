@@ -1,4 +1,4 @@
-﻿param([ValidateSet('menu','setup','start','pair','stop','status','doctor','login','groups','resolve','startup-on','startup-off','run','background-remove','uninstall')][string]$Action='menu', [string]$DataDirectory='', [string]$NodeExecutable='')
+﻿param([ValidateSet('menu','setup','project','start','pair','stop','status','doctor','login','groups','resolve','startup-on','startup-off','run','background-remove','uninstall')][string]$Action='menu', [string]$DataDirectory='', [string]$NodeExecutable='')
 $ErrorActionPreference='Stop'
 if ($PSVersionTable.PSVersion.Major -lt 6) { $env:PSModulePath = "$PSHOME\Modules;${env:ProgramFiles}\WindowsPowerShell\Modules" }
 $bridgeRoot=$PSScriptRoot
@@ -52,9 +52,9 @@ function Invoke-BridgeAction([string]$Selected) {
 if ($Action -ne 'menu') { Invoke-BridgeAction $Action; exit }
 while ($true) {
   Write-Host "`nFeishu Codex Bridge - 开发预览（尚未正式发布）"
-  Write-Host '1 配置  2 Codex 登录  3 首次配对（前台）  4 后台启动  5 状态  6 停止  7 诊断  8 群白名单  9 核对未知任务  10 开机启动  11 关闭开机启动  12 移除后台任务  13 卸载桥接服务（保留数据）  0 退出'
+  Write-Host '1 配置  2 Codex 登录  3 首次配对（前台）  4 后台启动  5 状态  6 停止  7 诊断  8 群白名单  9 核对未知任务  10 开机启动  11 关闭开机启动  12 移除后台任务  13 卸载桥接服务（保留数据）  14 选择已有项目  0 退出'
   $selection=Read-Host '选择'
   if ($selection -eq '0') { break }
-  $actions=@{'1'='setup';'2'='login';'3'='pair';'4'='start';'5'='status';'6'='stop';'7'='doctor';'8'='groups';'9'='resolve';'10'='startup-on';'11'='startup-off';'12'='background-remove';'13'='uninstall'}
+  $actions=@{'1'='setup';'2'='login';'3'='pair';'4'='start';'5'='status';'6'='stop';'7'='doctor';'8'='groups';'9'='resolve';'10'='startup-on';'11'='startup-off';'12'='background-remove';'13'='uninstall';'14'='project'}
   if ($actions.ContainsKey($selection)) { Invoke-BridgeAction $actions[$selection] }
 }

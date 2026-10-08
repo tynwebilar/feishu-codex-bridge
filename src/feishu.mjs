@@ -5,10 +5,10 @@ import { createReadStream } from 'node:fs';
 // SDK logs can contain request headers; expose only structured status from this adapter.
 const logger = { debug() {}, info() {}, warn() {}, error() {}, trace() {} };
 export function replyContent(text) {
-  // Match the native post/Markdown path used by openclaw-lark; never accept model card JSON.
+  // Keep normal replies in a card; render Markdown without accepting model card JSON.
   const markdown=String(text).replace(/(\[[^\]\n]{1,200}\])\s+\((https?:\/\/[^\s)]+)\)/g,'$1($2)')
     .replace(/<(?=\/?at\b)/gi,'&lt;');
-  return JSON.stringify({zh_cn:{content:[[{tag:'md',text:markdown}]]}});
+  return JSON.stringify({config:{wide_screen_mode:true},elements:[{tag:'div',text:{tag:'lark_md',content:markdown}}]});
 }
 Lark.defaultHttpInstance.defaults.timeout = 30_000;
 export function deliveryFailure(error) {
@@ -82,7 +82,7 @@ export async function connectFeishu(config) {
       }
       const content = replyContent(payload.text);
       const result = await client.im.message.reply({ path: { message_id: payload.replyTo },
-        data: { msg_type: 'post', content, uuid: payload.uuid } });
+        data: { msg_type: 'interactive', content, uuid: payload.uuid } });
       if (result.code !== 0 || !result.data?.message_id) throw Object.assign(new UserError('飞书回复未确认送达'), { code: result.code });
       return result.data.message_id;
     },
