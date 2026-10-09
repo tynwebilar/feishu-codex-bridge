@@ -1,6 +1,6 @@
 ---
 name: feishu-bridge-setup
-description: Install, set up, diagnose or uninstall the Windows Feishu Codex bridge. 安装、初始化、诊断或卸载 Windows 本机飞书 Codex 消息桥接。用于通过飞书与 Codex 对话、机器人配对和独立后台运行；不用于普通飞书文档、审批操作或 OpenClaw 配置。
+description: Install, set up, diagnose or uninstall the Windows Feishu Codex bridge. 安装、初始化、诊断或卸载 Windows 本机飞书 Codex 消息桥接。用于通过飞书与 Codex 对话、机器人配对和独立后台运行；不用于普通飞书文档、审批操作或其他机器人平台配置。
 ---
 
 # Feishu Codex Bridge / 飞书 Codex 桥接
@@ -10,11 +10,11 @@ Respond in the user's language. Read [English installation](../../INSTALL.md) or
 Git marketplace and source installations MUST pass `-LifecycleMode manual` to install-plugin.ps1. Fully uninstall the background bridge before removing a Git plugin; automatic remote-plugin removal detection is unavailable for this route. Only use automatic mode for the existing private account plugin. If origin is unclear, ask which installation route was used. Never silently bypass failed automatic enrollment.
 
 
-这是 Windows x64 本机桥接的开发预览。插件提供安装脚本和操作引导，消息由独立后台进程处理。无需 OpenClaw。先读插件根目录的 [docs/usage.zh-CN.md](../../docs/usage.zh-CN.md)，按用户当前阶段继续，不重复已完成操作。
+这是 Windows x64 本机桥接的开发预览。插件提供安装脚本和操作引导，消息由独立后台进程处理。先读插件根目录的 [docs/usage.zh-CN.md](../../docs/usage.zh-CN.md)，按用户当前阶段继续，不重复已完成操作。
 
 ## 初始化
 
-1. 确认 Windows x64、用户工作区绝对路径。询问是否已有独立飞书应用，只询问 App ID，不收集密钥。不要修改其他 OpenClaw 或已有机器人入口。同一应用只能安排一个桥接实例。Mac/Linux 暂不支持。
+1. 确认 Windows x64、用户工作区绝对路径。询问是否已有独立飞书应用，只询问 App ID，不收集密钥。不要修改其他应用或已有机器人入口。同一应用只能安排一个桥接实例。Mac/Linux 暂不支持。
 2. 插件根目录是本文件上两级；不要猜测插件缓存路径。先检查 `%USERPROFILE%\.feishu-codex-bridge-app\current.json`。已有安装时读取其中 runtimePath，使用该目录的管理脚本检查状态，避免重复安装或重配。
 3. 未安装时运行下列脚本（替换为解析出的绝对路径）：
    `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "<插件根目录>\scripts\install-plugin.ps1"`
