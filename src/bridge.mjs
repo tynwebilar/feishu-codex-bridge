@@ -7,6 +7,7 @@ import { dataDir, UserError } from './config.mjs';
 import { join } from 'node:path';
 import { deliveryFailure } from './feishu.mjs';
 import { authTool, authorize } from './authorization.mjs';
+import { SharedRules } from './shared-rules.mjs';
 
 export class Bridge {
   constructor(config, store, codex, feishu, projectId) {
@@ -14,6 +15,7 @@ export class Bridge {
     this.questions = new Map();
     this.reactions = new Map();
     this.ownershipConflicts = [];
+    this.sharedRules = new SharedRules(config.cwd || process.cwd());
     codex.onRequest = request => this.ask(request);
   }
   allowed(message) {
@@ -184,6 +186,7 @@ export class Bridge {
       this.store.bind(row.chat, thread.id);
       if (!previous) await this.codex.request('thread/name/set', { threadId: thread.id, name: m.title });
       if (row.cancelRequested) { this.store.finish(row, '任务已取消，未启动模型执行。', 'cancelled'); return; }
+      await this.sharedRules.apply(this.codex, thread.id);
       this.store.set(row.id, 'starting', { thread: thread.id });
       started = true;
       const completed = await this.codex.turn(thread.id, input, 30 * 60_000, async turnId => {
@@ -200,7 +203,7 @@ export class Bridge {
         this.uncertain = row.id;
         this.store.set(row.id, 'unknown');
         this.store.enqueue(row.id, m, '执行或结果读取中断，任务状态待核对。当前运行实例暂停新任务；请用 /recover 核对终态，或在本机停止服务后检查。', 'error');
-      } else this.store.finish(row, error.message?.includes('already has an active writer')
+      } else this.store.finish(row, error instanceof UserError ? error.message : error.message?.includes('already has an active writer')
         ? '该会话已被桌面或其他 Codex 实例占用，本条消息未执行。请先在占用端释放会话，再从飞书重新发送。桥接不会强行接管或重建历史。'
         : '未能启动 Codex 会话。请检查本机登录、权限和会话是否被桌面占用。', 'failed');
     } finally {

@@ -64,3 +64,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-plugin.ps1
 ## License
 
 [MIT](LICENSE). 第三方依赖保留各自许可。独立项目，非 OpenAI 或飞书官方产品。
+
+共享规则：修改绑定工作区根目录 `AGENTS.md`，下一轮自动注入已有会话，无需停服务或逐个确认。详见 [使用说明](USER-GUIDE.md)。

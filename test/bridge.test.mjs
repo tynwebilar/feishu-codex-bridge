@@ -188,7 +188,13 @@ test('bridge resumes the same thread, controls bypass the queue and recovery nev
     bridge.receive(event('om_b', 'second'));
     assert.equal(db.delivery(),undefined); // No receipt/running messages to clutter the conversation.
     assert.equal(reactions.length,2); // Duplicate inbound delivery does not add another reaction.
-    await bridge.work(); await bridge.work();
+    writeFileSync(join(dir,'AGENTS.md'),'SHARED_FIRST');
+    await bridge.work();
+    writeFileSync(join(dir,'AGENTS.md'),'SHARED_SECOND');
+    await bridge.work();
+    const injected=calls.filter(c=>c[0]==='thread/inject_items');
+    assert.equal(injected.length,2);
+    assert.match(injected[1][1].items[0].content[0].text,/SHARED_SECOND/);
     assert.equal(turns.length, 2);
     assert.equal(calls.filter(c => c[0] === 'thread/start').length, 1);
     assert.equal(calls.filter(c => c[0] === 'thread/resume').length, 1);

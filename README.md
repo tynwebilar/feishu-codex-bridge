@@ -64,3 +64,5 @@ Live probes consume quota and create real conversations. Never commit configurat
 ## License
 
 [MIT](LICENSE). Third-party dependencies retain their licenses. Independent project; not an official OpenAI or Feishu product.
+
+Shared rules: edit the bound workspace’s root `AGENTS.md`. The bridge reads it before each turn and injects changed content into the existing chat without a confirmation turn or service restart. See [details](USER-GUIDE.md).

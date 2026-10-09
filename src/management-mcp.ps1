@@ -44,6 +44,10 @@ function Invoke-ManagementTool($Name,$Arguments) {
     $s=Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
     $result=@{stale=([DateTime]::UtcNow-[DateTime]::Parse($s.updatedAt).ToUniversalTime()).TotalSeconds -gt 10}
     foreach ($key in @('updatedAt','stopped','feishu','codex','paired','active','pluginLifecycle','cli')) { if ($null -ne $s.$key) { $result[$key]=$s.$key } }
+    if ($null -ne $s.sharedRules) {
+      $result.sharedRules=@{}
+      foreach ($key in @('path','state','revision','checkedAt','threads')) { if ($null -ne $s.sharedRules.$key) { $result.sharedRules[$key]=$s.sharedRules.$key } }
+    }
     if ($null -ne $s.projectBinding) {
       $result.projectBinding=@{}
       foreach ($key in @('projectId','state','desktopVisibility')) { if ($null -ne $s.projectBinding.$key) { $result.projectBinding[$key]=$s.projectBinding.$key } }

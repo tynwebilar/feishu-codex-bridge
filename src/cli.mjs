@@ -213,6 +213,7 @@ async function serve() {
         void bridge.deliver().catch(() => { stopping = true; });
         const status = { updatedAt: new Date().toISOString(), pid: process.pid, appId: config.appId,
           cli:cliStatus,
+          sharedRules:bridge.sharedRules.status,
           feishu: feishu.status(), codex: codex.closed ? 'disconnected' : 'connected',
           paired: !!config.ownerId, active: !!bridge.active, ownershipConflicts: bridge.ownershipConflicts,
           pluginLifecycle:removalGuard?.status ?? 'not_enrolled',
