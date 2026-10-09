@@ -9,7 +9,7 @@
 
 An independent local bridge, without OpenClaw. A setup skill and seven management tools guide configuration; the background service handles messages while Codex runs the work. Keep your PC awake and online.
 
-> Distribution preview: the repository is private; Git installation requires access. Used in the maintainer’s daily workflow with second-computer acceptance completed; not all environments have been verified.
+> Windows x64 preview. This repository is currently private; Git installation requires access.
 
 ## Features
 
@@ -59,10 +59,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-plugin.ps1
 Full Windows bundle: `npm run package:windows`.
 Live probes consume quota and create real conversations. Never commit configuration, credentials, logs or attachments.
 
-[User guide / 使用说明](USER-GUIDE.md) · [Release checklist](RELEASE-CHECKLIST.md) · [Implementation history](docs/HISTORY.md)
+[User guide](docs/usage.md) · [Contributing](CONTRIBUTING.md) · [Architecture](docs/architecture.md)
+
+Shared rules: edit the bound workspace’s root `AGENTS.md`. The bridge reads it before each turn and injects changed content into the existing chat without a confirmation turn or service restart. See [details](docs/usage.zh-CN.md).
 
 ## License
 
 [MIT](LICENSE). Third-party dependencies retain their licenses. Independent project; not an official OpenAI or Feishu product.
-
-Shared rules: edit the bound workspace’s root `AGENTS.md`. The bridge reads it before each turn and injects changed content into the existing chat without a confirmation turn or service restart. See [details](USER-GUIDE.md).

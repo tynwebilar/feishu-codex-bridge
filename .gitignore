@@ -12,3 +12,6 @@ node_modules/
 *.db-*
 /test.txt
 dist/
+
+# Local planning, release evidence and maintenance notes (never distributed)
+/.local/

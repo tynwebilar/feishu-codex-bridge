@@ -9,7 +9,7 @@
 
 独立本机桥接，无需 OpenClaw。插件提供初始化 Skill 和七个管理工具，后台负责消息收发，Codex 执行任务。电脑需要保持开机、联网且不休眠。
 
-> 分发预览：仓库目前私有，命令安装需要仓库访问权限。已投入维护者日常使用，并完成跨电脑验收，不代表所有环境均已验证。
+> Windows x64 预览版。仓库目前私有，Git 安装需要访问权限。
 
 ## 功能
 
@@ -59,10 +59,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-plugin.ps1
 完整 Windows 包： `npm run package:windows`.
 真实探针会消耗额度并创建会话。不要提交配置、凭据、日志或附件。
 
-[User guide / 使用说明](USER-GUIDE.md) · [Release checklist](RELEASE-CHECKLIST.md) · [Implementation history](docs/HISTORY.md)
+[使用说明](docs/usage.zh-CN.md) · [开发贡献](CONTRIBUTING.md) · [架构说明](docs/architecture.md)
+
+共享规则：修改绑定工作区根目录 `AGENTS.md`，下一轮自动注入已有会话，无需停服务或逐个确认。详见 [使用说明](docs/usage.zh-CN.md)。
 
 ## License
 
 [MIT](LICENSE). 第三方依赖保留各自许可。独立项目，非 OpenAI 或飞书官方产品。
-
-共享规则：修改绑定工作区根目录 `AGENTS.md`，下一轮自动注入已有会话，无需停服务或逐个确认。详见 [使用说明](USER-GUIDE.md)。

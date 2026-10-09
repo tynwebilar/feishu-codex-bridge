@@ -21,7 +21,7 @@ if ((Get-FileHash -LiteralPath $NodeArchive -Algorithm SHA256).Hash.ToLowerInvar
 # Separate directories keep a running/previous installation intact on failure.
 $runtimePath=Join-Path $InstallRoot ("$version-"+[guid]::NewGuid().ToString('N').Substring(0,12))
 New-Item -ItemType Directory -Path $runtimePath | Out-Null
-foreach ($name in @('plugin.json','src','third-party','package.json','package-lock.json','README.md','README.zh-CN.md','INSTALL.md','INSTALL.zh-CN.md','LICENSE','assets','docs','LIFECYCLE-DECISION.md','RELEASE-CHECKLIST.md','PLAN.md','CODEX-INTEGRATION.md','USER-GUIDE.md','Start.cmd','manage.ps1')) {
+foreach ($name in @('plugin.json','src','third-party','package.json','package-lock.json','README.md','README.zh-CN.md','INSTALL.md','INSTALL.zh-CN.md','LICENSE','CONTRIBUTING.md','assets','docs','Start.cmd','manage.ps1')) {
   Copy-Item -LiteralPath (Join-Path $source $name) -Destination $runtimePath -Recurse
 }
 Expand-Archive -LiteralPath $NodeArchive -DestinationPath (Join-Path $runtimePath 'node-download')

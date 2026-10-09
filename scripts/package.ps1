@@ -17,7 +17,7 @@ $stamp=Get-Date -Format 'yyyyMMdd-HHmmss'
 $buildDir=Join-Path $bridgeRoot "dist\$version-preview-$stamp"
 $bundle=Join-Path $buildDir 'FeishuCodexBridge'
 New-Item -ItemType Directory -Force -Path $bundle | Out-Null
-foreach ($name in @('src','third-party','package.json','package-lock.json','README.md','README.zh-CN.md','INSTALL.md','INSTALL.zh-CN.md','LICENSE','assets','docs','LIFECYCLE-DECISION.md','USER-GUIDE.md','RELEASE-CHECKLIST.md','PLAN.md','CODEX-INTEGRATION.md','Start.cmd','manage.ps1')) {
+foreach ($name in @('src','third-party','package.json','package-lock.json','README.md','README.zh-CN.md','INSTALL.md','INSTALL.zh-CN.md','LICENSE','CONTRIBUTING.md','assets','docs','Start.cmd','manage.ps1')) {
   Copy-Item -LiteralPath (Join-Path $bridgeRoot $name) -Destination $bundle -Recurse
 }
 Push-Location $bundle

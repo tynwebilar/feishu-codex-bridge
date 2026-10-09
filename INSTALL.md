@@ -47,7 +47,7 @@ A plugin ZIP contains setup instructions, management MCP and installation script
 
 ## Verify
 
-Enable the bot, long-connection message events and required message/resource permissions in Feishu, then publish/approve as required by your tenant. See [detailed setup](USER-GUIDE.md). Optional QR creation and user authorization require the official Feishu CLI, installed separately.
+Enable the bot, long-connection message events and required message/resource permissions in Feishu, then publish/approve as required by your tenant. See [detailed setup](docs/usage.md). Optional QR creation and user authorization require the official Feishu CLI, installed separately.
 
 Verify paired=true, both connections ready and a fresh heartbeat. Test two-turn context, image/file input, file output, and replies after closing Codex Desktop. Desktop project grouping may require a restart. Groups start disabled; full-access execution is not confined to the workspace folder.
 
@@ -63,4 +63,4 @@ Ask Codex to fully uninstall the bridge, or run:
 
 Only after cleanup succeeds, remove the plugin in Codex. Git/source installations do not automatically detect plugin removal. Configuration, attachments and Codex history are retained; old runtime backups and custom installation directories may remain.
 
-Guided setup supports English; some runtime menus remain Chinese. Official store submission is deferred.
+Guided setup supports English; some runtime menus remain Chinese.
