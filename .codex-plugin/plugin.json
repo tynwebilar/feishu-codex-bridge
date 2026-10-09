@@ -1,0 +1,24 @@
+{
+  "name": "feishu-codex-bridge",
+  "version": "0.0.11",
+  "description": "Connect Feishu to Codex on your Windows PC. 飞书连接本机 Codex。",
+  "author": {
+    "name": "AI_research_center"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Feishu Codex Bridge",
+    "shortDescription": "Feishu ↔ Codex · 飞书桥接",
+    "longDescription": "Run Codex tasks from Feishu, with persistent conversations, files, approval cards and an independent Windows background service.\n通过飞书使用本机 Codex：连续会话、文件交付、授权卡片和独立后台运行。Windows x64 only. Requires your own Codex account and Feishu application. / 需要你自己的 Codex 账号与飞书应用。",
+    "developerName": "AI_research_center",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive"
+    ],
+    "defaultPrompt": "帮我初始化飞书 Codex 桥接，一步步引导我完成配置。",
+    "logo": "./assets/icon.svg",
+    "composerIcon": "./assets/icon.svg",
+    "brandColor": "#176BEE"
+  }
+}

@@ -6,7 +6,7 @@ if ($manifest.name -ne 'feishu-codex-bridge' -or $manifest.extensions.'com.opena
 $output=Join-Path $root ('dist\plugin-'+(Get-Date -Format 'yyyyMMdd-HHmmss'))
 $plugin=Join-Path $output $manifest.name
 New-Item -ItemType Directory -Path (Join-Path $plugin 'scripts') -Force | Out-Null
-foreach ($name in @('plugin.json','mcp.json','skills','src','third-party','package.json','package-lock.json','README.md','USER-GUIDE.md','Start.cmd','manage.ps1')) {
+foreach ($name in @('plugin.json','mcp.json','skills','src','third-party','package.json','package-lock.json','README.md','README.zh-CN.md','INSTALL.md','INSTALL.zh-CN.md','LICENSE','assets','docs','LIFECYCLE-DECISION.md','RELEASE-CHECKLIST.md','PLAN.md','CODEX-INTEGRATION.md','USER-GUIDE.md','Start.cmd','manage.ps1')) {
   Copy-Item -LiteralPath (Join-Path $root $name) -Destination $plugin -Recurse
 }
 Copy-Item -LiteralPath (Join-Path $root 'scripts\install-plugin.ps1') -Destination (Join-Path $plugin 'scripts')

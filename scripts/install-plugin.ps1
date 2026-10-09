@@ -1,4 +1,4 @@
-param([string]$InstallRoot=(Join-Path $env:USERPROFILE '.feishu-codex-bridge-app'), [string]$NodeArchive='')
+param([string]$InstallRoot=(Join-Path $env:USERPROFILE '.feishu-codex-bridge-app'), [string]$NodeArchive='', [ValidateSet('automatic','manual')][string]$LifecycleMode='automatic')
 $ErrorActionPreference='Stop'
 if ($PSVersionTable.PSVersion.Major -lt 6) { $env:PSModulePath="$PSHOME\Modules;${env:ProgramFiles}\WindowsPowerShell\Modules" }
 if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString() -ne 'X64') { throw 'Windows x64 required.' }
@@ -21,11 +21,12 @@ if ((Get-FileHash -LiteralPath $NodeArchive -Algorithm SHA256).Hash.ToLowerInvar
 # Separate directories keep a running/previous installation intact on failure.
 $runtimePath=Join-Path $InstallRoot ("$version-"+[guid]::NewGuid().ToString('N').Substring(0,12))
 New-Item -ItemType Directory -Path $runtimePath | Out-Null
-foreach ($name in @('plugin.json','src','third-party','package.json','package-lock.json','README.md','USER-GUIDE.md','Start.cmd','manage.ps1')) {
+foreach ($name in @('plugin.json','src','third-party','package.json','package-lock.json','README.md','README.zh-CN.md','INSTALL.md','INSTALL.zh-CN.md','LICENSE','assets','docs','LIFECYCLE-DECISION.md','RELEASE-CHECKLIST.md','PLAN.md','CODEX-INTEGRATION.md','USER-GUIDE.md','Start.cmd','manage.ps1')) {
   Copy-Item -LiteralPath (Join-Path $source $name) -Destination $runtimePath -Recurse
 }
 Expand-Archive -LiteralPath $NodeArchive -DestinationPath (Join-Path $runtimePath 'node-download')
 Move-Item -LiteralPath (Join-Path $runtimePath "node-download\node-v$nodeVersion-win-x64") -Destination (Join-Path $runtimePath 'runtime')
+[IO.File]::WriteAllText((Join-Path $runtimePath 'lifecycle-mode.json'),(@{mode=$LifecycleMode} | ConvertTo-Json))
 $node=Join-Path $runtimePath 'runtime\node.exe'
 Push-Location $runtimePath
 try {

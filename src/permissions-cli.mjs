@@ -9,7 +9,7 @@ try {
  if(args.operation==='get'){console.log(JSON.stringify({revision:revision(config),permissions:permissions(config),ownerId:config.ownerId,appId:config.appId}));}
  else if(args.operation==='set'){
   validatePermissions(args.permissions);
-  if(args.permissions.groups.some(g=>g.senderIds.some(id=>id!==config.ownerId)&&!g.trustedLocalAccess))throw new Error('TRUST_ACK_REQUIRED');
+  if(args.permissions.groups.some(g=>(g.allowAllMembers || g.senderIds.some(id=>id!==config.ownerId))&&!g.trustedLocalAccess))throw new Error('TRUST_ACK_REQUIRED');
   lock=createServer(s=>s.destroy());
   const key=createHash('sha256').update(config.appId).digest('hex').slice(0,24);
   await new Promise((ok,no)=>{lock.once('error',()=>no(new Error('STOP_REQUIRED')));lock.listen(`\\\\.\\pipe\\feishu-codex-${key}`,ok);});

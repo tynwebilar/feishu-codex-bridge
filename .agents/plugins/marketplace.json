@@ -1,0 +1,20 @@
+{
+  "name": "feishu-codex",
+  "interface": {
+    "displayName": "Feishu Codex Bridge"
+  },
+  "plugins": [
+    {
+      "name": "feishu-codex-bridge",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -51,12 +51,13 @@ export function chunks(text, limit = 4000) {
   const result = []; let part = '';
   for (const char of text) { if (part.length + char.length > limit) { result.push(part); part = ''; } part += char; }
   if (part) result.push(part);
-  return result.length ? result : ['任务已完成，但没有可发送的正文。'];
+  return result;
 }
 
 export function answerText(turn) {
   const final = turn.items?.filter(i => i.type === 'agentMessage' && i.phase !== 'commentary').map(i => i.text).filter(Boolean).join('\n\n');
   if (turn.status === 'interrupted') return `${final ? final + '\n\n' : ''}任务已停止。停止前的操作可能已执行。`;
   if (turn.status !== 'completed') return 'Codex 执行失败。请在本机查看对应会话；未自动重试。';
-  return final || '任务已完成，但没有可发送的正文。';
+  const text = final?.trim() ?? '';
+  return text === 'NO_REPLY' ? '' : text;
 }

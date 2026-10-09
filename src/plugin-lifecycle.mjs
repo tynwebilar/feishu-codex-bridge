@@ -43,6 +43,13 @@ if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url))
   const data=process.argv[2];
   if(!data) throw new Error('Data directory required');
   const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+  const mode=await readFile(join(root,'lifecycle-mode.json'),'utf8').then(JSON.parse,()=>null);
+  if(mode?.mode==='manual') {
+    await mkdir(data,{recursive:true});
+    await writeFile(join(data,'plugin-lifecycle.json'),JSON.stringify({version:1,mode:'manual'}));
+    console.log('Manual lifecycle: run bridge_uninstall before removing the Git/local plugin.');
+    process.exit(0);
+  }
   const codex=new AppServer(process.execPath,[join(root,'node_modules/@openai/codex/bin/codex.js'),'app-server']);
   try {
     await codex.initialize();const observation=await observePlugin(codex,{remotePluginId:pluginIdentity.remotePluginId});

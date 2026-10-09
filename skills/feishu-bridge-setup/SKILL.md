@@ -1,9 +1,14 @@
 ---
 name: feishu-bridge-setup
-description: 安装、初始化、诊断或卸载 Windows 本机飞书 Codex 消息桥接。用于通过飞书与 Codex 对话、机器人配对和独立后台运行；不用于普通飞书文档、审批操作或 OpenClaw 配置。
+description: Install, set up, diagnose or uninstall the Windows Feishu Codex bridge. 安装、初始化、诊断或卸载 Windows 本机飞书 Codex 消息桥接。用于通过飞书与 Codex 对话、机器人配对和独立后台运行；不用于普通飞书文档、审批操作或 OpenClaw 配置。
 ---
 
-# 飞书 Codex 桥接
+# Feishu Codex Bridge / 飞书 Codex 桥接
+
+Respond in the user's language. Read [English installation](../../INSTALL.md) or [中文安装](../../INSTALL.zh-CN.md). Explain Chinese terminal prompts in English when needed; never collect secrets in chat.
+
+Git marketplace and source installations MUST pass `-LifecycleMode manual` to install-plugin.ps1. Fully uninstall the background bridge before removing a Git plugin; automatic remote-plugin removal detection is unavailable for this route. Only use automatic mode for the existing private account plugin. If origin is unclear, ask which installation route was used. Never silently bypass failed automatic enrollment.
+
 
 这是 Windows x64 本机桥接的开发预览。插件提供安装脚本和操作引导，消息由独立后台进程处理。无需 OpenClaw。先读插件根目录的 [USER-GUIDE.md](../../USER-GUIDE.md)，按用户当前阶段继续，不重复已完成操作。
 
@@ -76,3 +81,5 @@ permissions.groupContext=shared 表示每群一个上下文（含话题），per
 初始化时先让用户在桌面添加工作目录，再在停止状态用 manage.ps1 -Action project 选择已有后台项目。明确后台 ID 时可用 node src/cli.mjs project <ID>；此 ID 不是桌面 list_projects 的本地 ID，必须通过 project/list 核对路径与名称，不能直接混用。保留原 dataDirectory。没有项目不创建，同路径多个项目不猜测。projectBinding.backend_selected 只表示后续新会话的后台目标，desktopVisibility=unverified 必须保留。旧版本无字段也不能宣称归组成功。
 
 已有会话不迁移/重建历史。当前桌面有会话右键“移动到项目”入口；无桌面控制工具时请用户操作并确认实际显示，不通过 shell 修改私有状态。后续新会话也可能需要手动归组，不承诺操作一次解决所有新会话。
+
+群规则 allowAllMembers=true 允许该已列出群的所有当前及未来人类成员发起任务，必须同时 trustedLocalAccess=true。无需读取群成员列表；私聊仍仅主人、未列出群不开放、主人管理命令限制不变。默认省略或 false 保留 senderIds 白名单。此权限允许成员使用当前本机执行权限。

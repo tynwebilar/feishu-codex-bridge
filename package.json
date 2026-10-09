@@ -1,6 +1,6 @@
 {
   "name": "feishu-codex-bridge",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "private": true,
   "type": "module",
   "engines": {
@@ -16,5 +16,6 @@
   "dependencies": {
     "@larksuiteoapi/node-sdk": "1.73.3",
     "@openai/codex": "0.155.1"
-  }
+  },
+  "license": "MIT"
 }

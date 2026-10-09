@@ -1,23 +1,26 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "feishu-codex-bridge",
-  "version": "0.0.10",
-  "description": "在 Windows 上引导安装、配对和管理飞书与 Codex 的独立消息桥接。开发预览。",
+  "version": "0.0.11",
+  "description": "Connect Feishu to Codex on your Windows PC. 飞书连接本机 Codex。",
   "author": {
     "name": "AI_research_center"
   },
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "飞书 Codex 桥接",
-        "shortDescription": "引导配置飞书对话与独立后台运行",
-        "longDescription": "通过初始化 Skill 安装本机运行环境，引导 Codex 登录、飞书机器人配置、主人配对及后台管理。仅支持 Windows x64；需要用户自己的 Codex 账号和飞书应用。当前为开发预览。",
+        "displayName": "Feishu Codex Bridge",
+        "shortDescription": "Feishu ↔ Codex · 飞书桥接",
+        "longDescription": "Run Codex tasks from Feishu, with persistent conversations, files, approval cards and an independent Windows background service.\n通过飞书使用本机 Codex：连续会话、文件交付、授权卡片和独立后台运行。Windows x64 only. Requires your own Codex account and Feishu application. / 需要你自己的 Codex 账号与飞书应用。",
         "developerName": "AI_research_center",
         "category": "Productivity",
         "capabilities": [
           "Interactive"
         ],
-        "defaultPrompt": "帮我初始化飞书 Codex 桥接，一步步引导我完成配置。"
+        "defaultPrompt": "帮我初始化飞书 Codex 桥接，一步步引导我完成配置。",
+        "logo": "./assets/icon.svg",
+        "composerIcon": "./assets/icon.svg",
+        "brandColor": "#176BEE"
       }
     }
   }

@@ -3,6 +3,21 @@ import assert from 'node:assert/strict';
 import {parseEvent} from '../src/messages.mjs';
 import {validatePermissions,admitted} from '../src/permissions.mjs';
 import {Bridge} from '../src/bridge.mjs';
+test('all-member groups require trust and retain group, private, mention and bot boundaries',()=>{
+ const rule={chatId:'oc_one',enabled:true,requireMention:false,senderIds:['ou_owner'],trustedLocalAccess:true,allowAllMembers:true};
+ const c={appId:'cli_test',ownerId:'ou_owner',botId:'ou_bot',groups:[],permissions:{groupContext:'shared',groups:[rule]}};
+ const e={sender:{sender_type:'user',sender_id:{open_id:'ou_new'}},message:{message_id:'om_test',chat_id:'oc_one',chat_type:'group',message_type:'text',content:'{"text":"hello"}'}};
+ validatePermissions(c.permissions);
+ assert.ok(parseEvent(e,c));
+ assert.equal(admitted(c,false,'oc_one','ou_new'),false);
+ assert.equal(admitted(c,true,'oc_other','ou_new'),false);
+ e.sender.sender_type='app';assert.equal(parseEvent(e,c),null);e.sender.sender_type='user';
+ rule.requireMention=true;assert.equal(parseEvent(e,c),null);rule.requireMention=false;
+ rule.enabled=false;assert.equal(parseEvent(e,c),null);rule.enabled=true;
+ rule.trustedLocalAccess=false;assert.equal(parseEvent(e,c),null);assert.throws(()=>validatePermissions(c.permissions),/TRUST_ACK_REQUIRED/);
+ rule.trustedLocalAccess=true;rule.allowAllMembers='true';assert.throws(()=>validatePermissions(c.permissions),/INVALID_PERMISSIONS/);
+ delete rule.allowAllMembers;assert.equal(parseEvent(e,c),null);
+});
 test('shared group keys retain sender identity, isolate chats and private input, gate members and management',async()=>{
  const c={appId:'cli_test',ownerId:'ou_owner',botId:'ou_bot',groups:[],permissions:{groupContext:'shared',groups:[{chatId:'oc_one',enabled:true,requireMention:true,senderIds:['ou_owner','ou_peer'],trustedLocalAccess:true}]}};
  validatePermissions(c.permissions);
