@@ -2,7 +2,7 @@
 
 [简体中文](INSTALL.zh-CN.md) · [Overview](README.md)
 
-Requires Windows x64, internet, your own Codex login and a Feishu bot application. The repository is private; Git installation requires access.
+Requires Windows x64, internet, your own Codex login and a Feishu bot application.
 
 ## Codex marketplace
 
@@ -43,7 +43,7 @@ For a separate profile, consistently append `-DataDirectory 'C:\your\profile'` t
 
 ## Archives
 
-A plugin ZIP contains setup instructions, management MCP and installation scripts. A full Windows bundle includes the runtime: extract it and open `Start.cmd`. Obtain preview packages from the maintainer and verify their SHA256. No public release is available yet. Never import another person's credentials.
+A plugin ZIP contains setup instructions, management MCP and installation scripts. A full Windows bundle includes the runtime: extract it and open `Start.cmd`. Build archives from source using the contribution guide and verify their SHA256. Never import another person's credentials.
 
 ## Verify
 

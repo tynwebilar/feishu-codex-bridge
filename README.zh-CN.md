@@ -49,7 +49,7 @@ Feishu Codex Bridge 把你自己的 Codex 接入飞书。让 AI 进入团队已�
 2. **连接你自己的账号与机器人**，选择工作区和执行权限。
 3. **完成配对，发出第一条消息**，从截图、问题或一个小任务开始。
 
-仓库目前私有，命令安装需仓库访问权限。使用支持插件市场的 Codex CLI：
+使用支持插件市场的 Codex CLI：
 
 ```powershell
 codex plugin marketplace add tynwebilar/feishu-codex-bridge

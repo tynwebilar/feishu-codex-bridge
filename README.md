@@ -49,7 +49,7 @@ Business access comes from your configured skills, MCP servers, CLIs and account
 2. **Connect your own account and bot.** Choose a workspace and execution permissions.
 3. **Pair and send a message.** Start with a screenshot, a question or a small task.
 
-The repository is currently private; Git installation requires access. With a Codex CLI that supports plugin marketplaces:
+With a Codex CLI that supports plugin marketplaces:
 
 ```powershell
 codex plugin marketplace add tynwebilar/feishu-codex-bridge
