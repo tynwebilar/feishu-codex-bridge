@@ -1,6 +1,6 @@
 {
   "name": "feishu-codex-bridge",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Connect Feishu to Codex on your Windows PC. 飞书连接本机 Codex。",
   "author": {
     "name": "AI_research_center"

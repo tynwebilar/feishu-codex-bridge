@@ -17,6 +17,8 @@ The bridge runs on your Windows PC with your own Codex login and Feishu bot. Kee
 
 Inputs include text, rich text, PNG/JPEG/GIF/WebP images up to 10 MB each, and files up to 25 MB each, with at most five attachments per message. Attachments are not automatically executed or unpacked. Generated files are delivered from the current chat's `.feishu-bridge/<chat>/outgoing` directory.
 
+Rich text supports native code blocks (preserving language, indentation and line breaks), Markdown and separators. Emoji are converted to text markers and do not reject an image/text message. Unrecognized content nodes still reject the message rather than silently dropping content. The existing limits remain: 30,000 characters after conversion and 100,000 bytes for the incoming JSON content.
+
 Replies use interactive cards. Typing reactions require the corresponding Feishu reaction permission. A completed turn with no text or exactly `NO_REPLY` stays silent; failures and interruptions still produce notices. Document links do not guarantee a native document preview.
 
 ## Bot and authorization
@@ -54,3 +56,5 @@ Seven tools manage status, diagnosis, start, stop, uninstall and group permissio
 The default data directory is `%USERPROFILE%\.feishu-codex-bridge`; use `-DataDirectory` consistently for other profiles. It contains encrypted credentials, inbound messages, queues and delivery records. Attachments live in the workspace; Codex stores its own history. No automatic retention cleanup is provided.
 
 Follow [upgrade and uninstall instructions](../INSTALL.md#upgrade-and-uninstall). Git/source installs require manual service cleanup before plugin removal. The private account plugin can monitor removal only after verified enrollment and while its service runs; errors, disabled plugins and missing directories do not count as confirmed removal. This is polling, not an official uninstall callback. User data is retained by default.
+
+Standalone sticker messages are silently ignored: Feishu does not expose their image data for download. They do not start a model turn or send an unsupported-message reply. Ordinary images and inline emoji remain supported.

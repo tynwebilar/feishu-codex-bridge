@@ -10,6 +10,8 @@ export function parseEvent(event, config) {
   const group = m.chat_type === 'group';
   if (m.chat_type !== 'p2p' && !group) return null;
   if(!admitted(config,group,m.chat_id,s.sender_id.open_id)) return null;
+  // Feishu cannot provide sticker pixels; ignore them without a reply or model turn.
+  if (m.message_type === 'sticker') return null;
   const rule=group && permissions(config).groups.find(g=>g.chatId===m.chat_id);
   if(group && rule.requireMention && !m.mentions?.some(x=>x.id?.open_id===config.botId)) return null;
   if (typeof m.content !== 'string' || Buffer.byteLength(m.content) > 100_000) return null;
@@ -28,7 +30,22 @@ export function parseEvent(event, config) {
       if (!Array.isArray(line)) return null;
       for (const node of line) {
         if (!node || typeof node !== 'object') return null;
-        if (node.tag === 'text' || node.tag === 'a') text += node.text ?? '';
+        if (node.tag === 'text' || node.tag === 'a' || node.tag === 'md') {
+          if (typeof node.text !== 'string') return null;
+          text += node.text;
+        }
+        else if (node.tag === 'code_block') {
+          if (typeof node.text !== 'string') return null;
+          const language = typeof node.language === 'string' && /^[\w+#.-]{1,40}$/.test(node.language) ? node.language : '';
+          // A longer fence keeps embedded Markdown fences inside the code block.
+          const fence = '`'.repeat((node.text.match(/`+/g) ?? []).reduce((length, run) => Math.max(length, run.length + 1), 3));
+          text += `\n${fence}${language}\n${node.text}${node.text.endsWith('\n') ? '' : '\n'}${fence}\n`;
+        }
+        else if (node.tag === 'emotion') {
+          if (typeof node.emoji_type !== 'string') return null;
+          text += `[表情:${node.emoji_type}]`;
+        }
+        else if (node.tag === 'hr') text += '\n---\n';
         else if (node.tag === 'img') attachments.push({ type: 'image', key: node.image_key });
         else if (node.tag !== 'at') unsupported = true;
       }

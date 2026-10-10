@@ -62,6 +62,7 @@ codex plugin add feishu-codex-bridge@feishu-codex
 
 - **Shared groups, separate private chats.** Choose which groups and members can use the bot.
 - **Continuous context.** Continue across messages and service restarts, or start fresh with /new.
+- **Rich-text input.** Send native code blocks with indentation preserved, or combine images, text and emoji in one message.
 - **Independent background service.** Keep working after Desktop closes; your PC must remain awake and online.
 - **One shared working agreement.** Update the workspace's root Markdown rules for the next turn.
 - **Your own Codex.** Run locally with your configured tools and working environment.
