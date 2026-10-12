@@ -31,6 +31,8 @@ Guided setup can create a Feishu application by QR code or connect an existing b
 
 For personal Feishu resources, the owner gets a card showing requested permissions and an authorization button in private chat. After authorization, the original task continues without a separate “done” message. This optional feature requires the official Feishu CLI; setup checks for it.
 
+File messages and rich-text attachments expose their names first; the agent can download them when needed through the official Feishu CLI as the bot.
+
 ## Give it real work
 
 | Say it in Feishu | What the workflow can do |

@@ -25,6 +25,14 @@ export function parseEvent(event, config) {
   else if (m.message_type === 'post') {
     const post = Array.isArray(body.content) ? body : body.zh_cn ?? body.en_us;
     if (!post || !Array.isArray(post.content)) return null;
+    if (post.files !== undefined) {
+      if (!Array.isArray(post.files)) return null;
+      for (const file of post.files) {
+        if (!file || typeof file.file_name !== 'string' || typeof file.file_key !== 'string') return null;
+        if (file.is_folder) unsupported = true;
+        else attachments.push({ type: 'file', key: file.file_key, name: file.file_name });
+      }
+    }
     text = typeof post.title === 'string' ? post.title + '\n' : '';
     for (const line of post.content) {
       if (!Array.isArray(line)) return null;
@@ -61,6 +69,7 @@ export function parseEvent(event, config) {
   // Group members never share the owner's private conversation; topics stay isolated.
   const chat = JSON.stringify([config.appId, m.chat_type, m.chat_id, group && permissions(config).groupContext==='shared' ? '*' : s.sender_id.open_id, group && permissions(config).groupContext!=='shared' ? m.thread_id ?? '' : '']);
   return { id: m.message_id, chat, chatId: m.chat_id, senderId:s.sender_id.open_id, group, text, attachments, unsupported,
+    replyTo: typeof m.parent_id === 'string' && /^om_[\w-]+$/.test(m.parent_id) ? m.parent_id : undefined,
     title: `飞书${group ? '群聊' : '私聊'} · ${createHash('sha256').update(chat).digest('hex').slice(0, 8)}` };
 }
 

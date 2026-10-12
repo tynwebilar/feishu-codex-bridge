@@ -15,7 +15,7 @@ The bridge runs on your Windows PC with your own Codex login and Feishu bot. Kee
 | `/recover` | Read the original execution's terminal state; do not rerun it. |
 | `/retry` | Retry uncertain delivery within its 45-minute window using the original UUID; do not rerun the model task. |
 
-Inputs include text, rich text, PNG/JPEG/GIF/WebP images up to 10 MB each, and files up to 25 MB each, with at most five attachments per message. Attachments are not automatically executed or unpacked. Generated files are delivered from the current chat's `.feishu-bridge/<chat>/outgoing` directory.
+Inputs include text, rich text, PNG/JPEG/GIF/WebP images up to 10 MB each, and file metadata, with at most five attachments per message. Standalone files and rich-text `files[]` expose the filename, message ID and resource key without downloading. The agent decides whether to download using the official Feishu CLI as the bot; the CLI and Feishu enforce download limits. Replies retain the parent message ID for on-demand lookup in the current chat. Attachments are not automatically executed or unpacked. Generated files (up to 25 MB each) are delivered from the current chat's `.feishu-bridge/<chat>/outgoing` directory.
 
 Rich text supports native code blocks (preserving language, indentation and line breaks), Markdown and separators. Emoji are converted to text markers and do not reject an image/text message. Unrecognized content nodes still reject the message rather than silently dropping content. The existing limits remain: 30,000 characters after conversion and 100,000 bytes for the incoming JSON content.
 

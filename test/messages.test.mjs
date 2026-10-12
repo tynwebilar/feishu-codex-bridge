@@ -28,6 +28,29 @@ function event(content, locale) {
   };
 }
 
+test('file-only posts and quoted messages retain discoverable resource metadata', () => {
+  const raw = event([[{ tag: 'at', user_id: 'ou_other' }]]);
+  const file = { file_key: 'file_csv', file_name: 'usage.csv', is_folder: false };
+  raw.message.content = JSON.stringify({ content: [[{ tag: 'at', user_id: 'ou_other' }]], files: [file] });
+  raw.message.parent_id = 'om_parent';
+  const parsed = parseEvent(raw, config);
+  assert.equal(parsed.unsupported, false);
+  assert.equal(parsed.replyTo, 'om_parent');
+  assert.deepEqual(parsed.attachments, [{ type: 'file', key: 'file_csv', name: 'usage.csv' }]);
+  let accepted;
+  new Bridge(config, { accept: m => { accepted = m; return 'queued'; }, unknown: () => [], get: () => ({}),
+    finish: () => assert.fail('attachment-only message must not be rejected') }, {}, {}).receive(raw);
+  assert.equal(accepted.attachments.length, 1);
+  for (const files of [{}, [null], [{ ...file, file_name: {} }]]) {
+    raw.message.content = JSON.stringify({ content: [], files });
+    assert.equal(parseEvent(raw, config), null);
+  }
+  for (const files of [Array(6).fill(file), [{ ...file, is_folder: true }]]) {
+    raw.message.content = JSON.stringify({ content: [], files });
+    assert.equal(parseEvent(raw, config).unsupported, true);
+  }
+});
+
 test('native code blocks retain language, indentation, blank lines and trailing spaces', () => {
   const code = '\n  def example():\n\treturn 1  \n\n';
   for (const locale of [undefined, 'zh_cn', 'en_us']) {
