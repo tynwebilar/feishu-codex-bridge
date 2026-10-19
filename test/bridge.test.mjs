@@ -92,13 +92,20 @@ test('uncertain runtime execution pauses sibling chats until terminal recovery',
     await bridge.work(); await bridge.work();
     assert.equal(starts, 1);
     assert.equal(db.get('om_two').state, 'queued');
-    await bridge.recover(db.unknown(first.chat));
+    bridge.nextRecoveryAt = 0;
+    await bridge.work();
     assert.equal(bridge.uncertain, first.id);
     terminal = true;
-    await bridge.recover(db.unknown(first.chat));
+    await bridge.work();
+    assert.equal(bridge.uncertain, first.id); // Wait for the next bounded poll.
+    bridge.nextRecoveryAt = 0;
+    // Do not start the next queued task until the recovered state is inspected.
+    db.set('om_two', 'cancelled');
+    await bridge.work();
     assert.equal(bridge.uncertain, null);
     assert.equal(db.get(first.id).state, 'completed');
     assert.equal(starts, 1); // Recovery must not replay the model.
+    db.set('om_two', 'queued');
     await bridge.work();
     assert.equal(starts, 2);
   } finally { db.close(); rmSync(dir, { recursive:true, force:true }); }

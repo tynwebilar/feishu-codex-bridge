@@ -85,3 +85,5 @@ Node.js 22.22+. Run `npm ci` and `npm test`. See the contribution guide for pack
 ## License
 
 [MIT](LICENSE). Dependencies retain their licenses. Independent project; not an official OpenAI or Feishu product.
+
+Unknown task outcomes are checked automatically every 30 seconds; confirmed terminal results unblock queued work without replaying the original task.

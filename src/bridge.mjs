@@ -160,7 +160,17 @@ export class Bridge {
   }
   async work() {
     // ponytail: one model turn globally; use per-chat clients only if real queue latency requires it.
-    if (this.active || this.uncertain || this.codex.closed || !this.config.ownerId) return;
+    if (this.active || this.recovering || this.codex.closed || !this.config.ownerId) return;
+    if (Date.now() >= (this.nextRecoveryAt ?? 0)) {
+      this.nextRecoveryAt = Date.now() + 30_000;
+      const unknown = this.store.db.prepare("SELECT * FROM inbox WHERE state='unknown' ORDER BY created LIMIT 10").all();
+      if (unknown.length) {
+        this.recovering = true;
+        try { await this.recover(unknown); }
+        finally { this.recovering = false; }
+      }
+    }
+    if (this.uncertain) return;
     const row = this.store.next();
     if (!row) return;
     this.active = row;

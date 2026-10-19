@@ -58,3 +58,5 @@ The default data directory is `%USERPROFILE%\.feishu-codex-bridge`; use `-DataDi
 Follow [upgrade and uninstall instructions](../INSTALL.md#upgrade-and-uninstall). Git/source installs require manual service cleanup before plugin removal. The private account plugin can monitor removal only after verified enrollment and while its service runs; errors, disabled plugins and missing directories do not count as confirmed removal. This is polling, not an official uninstall callback. User data is retained by default.
 
 Standalone sticker messages are silently ignored: Feishu does not expose their image data for download. They do not start a model turn or send an unsupported-message reply. Ordinary images and inline emoji remain supported.
+
+Unknown task outcomes are checked every 30 seconds while the scheduler is idle, up to 10 records per pass. Only confirmed completed, failed or interrupted turns release their blocked chat. Missing or nonterminal turns remain blocked; recovery does not replay tasks.
